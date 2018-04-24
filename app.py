@@ -13,19 +13,13 @@ from dash import Dash
 from dash.dependencies import Input, Output
 
 
-py.sign_in(os.environ['PLOTLY_USERNAME'], os.environ['PLOTLY_API_KEY'])
+def query_data():
+    url = r"http://localhost:9200/dashboard/klocwork/_search?pretty"
+    resp = requests.get(url)
+    records = resp.json()["hits"]["hits"]
+    records = map(lambda r: r["_source"], records)
+    return list(records)
 
-# usgs = 'http://earthquake.usgs.gov/earthquakes/'
-# geoJsonFeed = 'feed/v1.0/summary/4.5_month.geojson'
-# url = '{}{}'.format(usgs, geoJsonFeed)
-# req = requests.get(url)
-# data = json.loads(req.text)
-
-now = datetime.datetime.now()
-data = [{"Magnitude": 4.5, "Latitude": 10.9, "Longitude": "91.7", "Time": now, "Place": "India", "Detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us1000dr23.geojson"},
-       {"Magnitude": 4.5, "Latitude": 10.9, "Longitude": "91.7", "Time": now, "Place": "India", "Detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us1000dr23.geojson"},
-       {"Magnitude": 4.5, "Latitude": 10.9, "Longitude": "91.7", "Time": now, "Place": "India", "Detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us1000dr23.geojson"},
-       ]
 
 theme = {
     'font-family': 'Raleway',
@@ -33,45 +27,25 @@ theme = {
 }
 
 
-def convert_timestamp(timestamp_ms):
-    return arrow.get(timestamp_ms / 1000.0).format()
-
-
-# def create_dataframe(d):
-#     features = d['features']
-#     properties = [x['properties'] for x in features]
-#     geometries = [x['geometry'] for x in features]
-#     coordinates = [x['coordinates'] for x in geometries]
-#     times = [convert_timestamp(x['time']) for x in properties]
-#     dd = {
-#         'Place': [x['place'] for x in properties],
-#         'Magnitude': [x['mag'] for x in properties],
-#         'Time': times,
-#         'Detail': [x['detail'] for x in properties],
-#         'Longitude': [x[0] for x in coordinates],
-#         'Latitude': [x[1] for x in coordinates],
-#     }
-#     return pd.DataFrame(dd)
-
 def create_dataframe(d):
     return pd.DataFrame(d)
 
-
+data = query_data()
 dataframe = create_dataframe(data)
 
 
 def create_td(series, col):
     val = series[col]
-    if col == 'Detail':
+    if col == 'file_url_path':
         td = html.Td(
-            html.A(children='GeoJSON', href='{}'.format(val), target='_blank'))
+            html.A(children='url', href='{}'.format(val), target='_blank'))
     else:
         td = html.Td(val)
     return td
 
 
 def create_table(df):
-    columns = ['Magnitude', 'Latitude', 'Longitude', 'Time', 'Place', 'Detail']
+    columns = df.columns.tolist()
     num_rows = len(df)
     thead = html.Thead(html.Tr([html.Th(col) for col in columns]))
     table_rows = list()
@@ -94,7 +68,7 @@ def create_header(some_string):
     return header
 
 
-app_name = 'Dash Earthquakes'
+app_name = 'klocwork Tables'
 server = Flask(app_name)
 server.secret_key = os.environ.get('SECRET_KEY', 'default-secret-key')
 app = Dash(name=app_name, server=server)
