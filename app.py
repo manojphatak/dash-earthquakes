@@ -21,9 +21,6 @@ req = requests.get(url)
 data = json.loads(req.text)
 
 
-mapbox_access_token = os.environ.get('MAPBOX_ACCESS_TOKEN', 'mapbox-token')
-
-
 theme = {
     'font-family': 'Raleway',
     'background-color': '#787878',
@@ -49,26 +46,10 @@ def create_dataframe(d):
         'Latitude': [x[1] for x in coordinates],
         'Depth': [x[2] for x in coordinates],
     }
-    # html text to display when hovering
-    texts = list()
-    for i in range(len(properties)):
-        text = '{}<br>{}<br>Magnitude: {}<br>Depth: {} km'.format(
-            dd['Time'][i], dd['Place'][i], dd['Magnitude'][i], dd['Depth'][i])
-        texts.append(text)
-    dd.update({'Text': texts})
     return pd.DataFrame(dd)
 
 
-def create_metadata(d):
-    dd = {
-        'title': d['metadata']['title'],
-        'api': d['metadata']['api'],
-    }
-    return dd
-
 dataframe = create_dataframe(data)
-metadata = create_metadata(data)
-# print(dataframe.head())
 
 
 def create_td(series, col):
@@ -83,7 +64,7 @@ def create_td(series, col):
 
 def create_table(df):
     columns = ['Magnitude', 'Latitude', 'Longitude', 'Time', 'Place', 'Detail']
-    num_rows = data['metadata']['count']
+    num_rows = len(df)
     thead = html.Thead(html.Tr([html.Th(col) for col in columns]))
     table_rows = list()
     for i in range(num_rows):
