@@ -272,28 +272,6 @@ def create_dropdowns():
     return [drop1, drop2]
 
 
-def create_description():
-    div = html.Div(
-        children=[
-            dcc.Markdown('''
-            The redder the outer circle, the higher the magnitude. The darker 
-            the inner circle, the deeper the earthquake.
-                        
-            > Currently no organization or government or scientist is capable 
-            > of succesfully predicting the time and occurrence of an
-            > earthquake.
-            > — Michael Blanpied
-            
-            Use the table below to know more about the {} earthquakes that 
-            exceeded magnitude 4.5 last month.
-
-            ***
-            '''.format(data['metadata']['count']).replace('  ', '')),
-        ],
-    )
-    return div
-
-
 def create_content():
     # create empty figure. It will be updated when _update_graph is triggered
     graph = dcc.Graph(id='graph-geo')
@@ -322,7 +300,6 @@ app.layout = html.Div(
             children=[
                 html.Div(create_dropdowns(), className='row'),
                 html.Div(create_content(), className='row'),
-                html.Div(create_description(), className='row'),
                 html.Div(create_table(dataframe), className='row'),
             ],
         ),
