@@ -152,132 +152,6 @@ def create_header(some_string):
     return header
 
 
-def create_footer():
-    p = html.P(
-        children=[
-            html.Span('Built with '),
-            html.A('Plotly Dash',
-                   href='https://github.com/plotly/dash', target='_blank'),
-            html.Span(' and:'),
-        ],
-    )
-
-    span_style = {'vertical-align': 'top', 'padding-left': '1rem'}
-
-    usgs = html.A(
-        children=[
-            html.I([], className='fa fa-list fa-2x'),
-            html.Span('USGS GeoJSON feed', style=span_style)
-        ], style={'text-decoration': 'none'},
-        href='https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php',
-        target='_blank')
-    mapbox = html.A(
-        children=[
-            html.I([], className='fa fa-map-o fa-2x'),
-            html.Span('mapbox', style=span_style)
-        ], style={'text-decoration': 'none'},
-        href='https://www.mapbox.com/', target='_blank')
-
-    font_awesome = html.A(
-        children=[
-            html.I([], className='fa fa-font-awesome fa-2x'),
-            html.Span('Font Awesome', style=span_style)
-        ], style={'text-decoration': 'none'},
-        href='http://fontawesome.io/', target='_blank')
-    datatables = html.A(
-        children=[
-            html.I([], className='fa fa-table fa-2x'),
-            html.Span('jQuery Datatables', style=span_style)
-        ], style={'text-decoration': 'none'},
-        href='https://datatables.net/', target='_blank')
-
-    ul1 = html.Ul(
-        children=[
-            html.Li(mapbox),
-            html.Li(font_awesome),
-            html.Li(datatables),
-            html.Li(usgs),
-        ],
-        style={'list-style-type': 'none'},
-    )
-
-    hashtags = 'plotly,dash,usgs'
-    tweet = 'Dash Earthquake, a cool dashboard with Plotly Dash!'
-    twitter_href = 'https://twitter.com/intent/tweet?hashtags={}&text={}'\
-        .format(hashtags, tweet)
-    twitter = html.A(
-        children=html.I(children=[], className='fa fa-twitter fa-3x'),
-        title='Tweet me!', href=twitter_href, target='_blank')
-
-    github = html.A(
-        children=html.I(children=[], className='fa fa-github fa-3x'),
-        title='Repo on GitHub',
-        href='https://github.com/jackdbd/dash-earthquakes', target='_blank')
-
-    li_right_first = {'line-style-type': 'none', 'display': 'inline-block'}
-    li_right_others = {k: v for k, v in li_right_first.items()}
-    li_right_others.update({'margin-left': '10px'})
-    ul2 = html.Ul(
-        children=[
-            html.Li(twitter, style=li_right_first),
-            html.Li(github, style=li_right_others),
-        ],
-        style={
-            'position': 'absolute',
-            'right': '1.5rem',
-            'bottom': '1.5rem',
-        }
-    )
-
-    div = html.Div([p, ul1, ul2])
-    footer_style = {
-        'font-size': '2.2rem',
-        'background-color': theme['background-color'],
-        'padding': '2.5rem',
-        'margin-top': '3rem',
-    }
-    footer = html.Footer(div, style=footer_style)
-    return footer
-
-
-def create_dropdowns():
-    drop1 = dcc.Dropdown(
-        options=[
-            {'label': 'Light', 'value': 'light'},
-            {'label': 'Dark', 'value': 'dark'},
-            {'label': 'Satellite', 'value': 'satellite'},
-            {
-                'label': 'Custom',
-                'value': 'mapbox://styles/jackdbd/cj6nva4oi14542rqr3djx1liz'
-            }
-        ],
-        value='dark',
-        id='dropdown-map-style',
-        className='three columns offset-by-one'
-    )
-    drop2 = dcc.Dropdown(
-        options=[
-            {'label': 'World', 'value': 'world'},
-            {'label': 'Europe', 'value': 'europe'},
-            {'label': 'North America', 'value': 'north_america'},
-            {'label': 'South America', 'value': 'south_america'},
-            {'label': 'Africa', 'value': 'africa'},
-            {'label': 'Asia', 'value': 'asia'},
-            {'label': 'Oceania', 'value': 'oceania'},
-        ],
-        value='world',
-        id='dropdown-region',
-        className='three columns offset-by-four'
-    )
-    return [drop1, drop2]
-
-
-def create_content():
-    # create empty figure. It will be updated when _update_graph is triggered
-    graph = dcc.Graph(id='graph-geo')
-    content = html.Div(graph, id='content')
-    return content
-
 regions = {
     'world': {'lat': 0, 'lon': 0, 'zoom': 1},
     'europe': {'lat': 50, 'lon': 0, 'zoom': 3},
@@ -298,13 +172,9 @@ app.layout = html.Div(
         create_header(app_name),
         html.Div(
             children=[
-                html.Div(create_dropdowns(), className='row'),
-                html.Div(create_content(), className='row'),
                 html.Div(create_table(dataframe), className='row'),
             ],
         ),
-        # html.Hr(),
-        create_footer(),
     ],
     className='container',
     style={'font-family': theme['font-family']}
