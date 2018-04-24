@@ -44,7 +44,6 @@ def create_dataframe(d):
         'Detail': [x['detail'] for x in properties],
         'Longitude': [x[0] for x in coordinates],
         'Latitude': [x[1] for x in coordinates],
-        'Depth': [x[2] for x in coordinates],
     }
     return pd.DataFrame(dd)
 
